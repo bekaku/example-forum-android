@@ -18,7 +18,7 @@ public class ApiUtil {
 
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static final MediaType X_WWW_FORM_URLENCODE = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
-    public static final String API_URI = "/grandats_project/forum/api";
+    public static final String API_URI = "/forum/api";
 
     public static String okHttpGet(String url, HashMap<String, String> params){
 
