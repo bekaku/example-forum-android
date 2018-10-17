@@ -37,8 +37,6 @@
             android:name=".PostActivity"
             android:label="Comment Post"
             android:theme="@style/AppTheme" />
-        <activity android:name=".CallApiActivity">
-        </activity>
     </application>
 
 </manifest>
