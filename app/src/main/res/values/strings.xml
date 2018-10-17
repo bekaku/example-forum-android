@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">Android Forum</string>
+    <string name="app_author_credit">By Grand Ats Co.,Ltd</string>
+    <string name="title_activity_login">Sign in</string>
+    <!-- Strings related to login -->
+    <string name="txt_server_ip">ไอพีแอดเดรสของเซิฟเวอร์</string>
+    <string name="txt_server_ip_hint">เช่น http://192.168.7.77</string>
+    <string name="prompt_username">ชื่อผู้ใช้</string>
+    <string name="prompt_password">รหัสผ่าน</string>
+    <string name="prompt_password_conf">ยืนยันรหัสผ่าน</string>
+    <string name="prompt_email">อีเมล์</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">เข้าสู่ระบบ</string>
+    <string name="action_register_short">สมัคร</string>
+    <string name="action_ok">ตกลง</string>
+    <string name="action_cancle">ยกเลิก</string>
+    <string name="action_search_thread">ค้นหากระทู้</string>
+    <string name="action_loadmore">โหลดข้อมูลเพิ่ม</string>
+    <string name="action_loading">กำลังโหลดข้อมูล&#8230;</string>
+
+    <string name="err_ipaddress">ไอพีแอดเดรสไม่ถูกต้องหรือเซิฟเวอร์ไม่พบเซิฟเวอร์ที่กำหนด</string>
+    <string name="err_ipaddress_empty">กรุณาระบุเลขไอพีแอดเดรส</string>
+    <string name="err_empty_form">กรุณากรอกข้อมูลให้ครบ</string>
+    <string name="err_pwd_confirm">รหัสผ่านและยืนยันรหัสผ่านไม่ถูกต้อง</string>
+    <string name="text_dummy">Dummy</string>
+
+    <!-- Font -->
+    <string name="fa_comment_alt">&#xf27a;</string>
+    <string name="fa_comments">&#xf086;</string>
+    <string name="fa_server">&#xf233;</string>
+    <string name="fa_check_circle">&#xf058;</string>
+    <string name="fa_ellipsis_v">&#xf142;</string>
+    <string name="fa_plus">&#xf067;</string>
+    <string name="fa_search">&#xf002;</string>
+    <string name="fa_times">&#xf00d;</string>
+    <string name="fa_clock">&#xf017;</string>
+    <string name="fa_thumbs_up">&#xf164;</string>
+    <string name="fa_thumbs_down">&#xf165;</string>
+    <string name="fa_caret_left">&#xf0d9;</string>
+</resources>
