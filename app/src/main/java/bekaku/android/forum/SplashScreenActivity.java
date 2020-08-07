@@ -71,14 +71,13 @@ public class SplashScreenActivity extends AppCompatActivity {
                 Intent iMain = new Intent(SplashScreenActivity.this, MainActivity.class);
                 startActivity(iMain);
                 //close current activity
-                finish();
             }else{
                 //go to login activity
                 Intent iLogin = new Intent(SplashScreenActivity.this, LoginActivity.class);
                 startActivity(iLogin);
                 //close current activity
-                finish();
             }
+            finish();
         }else{
             //open Dialog and Create new api ip address and go to login activity
             DialogSettingServerIp dialogSettingServerIp = new DialogSettingServerIp(SplashScreenActivity.this);

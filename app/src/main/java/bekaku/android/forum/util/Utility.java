@@ -24,6 +24,7 @@ public class Utility {
         }
     }
     public static boolean pingToHost(String ipUrl){
+        Log.i("pingToHost", ipUrl);
         HttpURLConnection connection = null;
         try {
             URL u = new URL(ipUrl);//http://www.google.com/

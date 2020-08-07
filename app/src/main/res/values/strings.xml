@@ -5,6 +5,7 @@
     <!-- Strings related to login -->
     <string name="txt_server_ip">ไอพีแอดเดรสของเซิฟเวอร์</string>
     <string name="txt_server_ip_hint">เช่น http://192.168.7.77</string>
+    <string name="localhostIp">http://10.0.3.2</string>
     <string name="prompt_username">ชื่อผู้ใช้</string>
     <string name="prompt_password">รหัสผ่าน</string>
     <string name="prompt_password_conf">ยืนยันรหัสผ่าน</string>

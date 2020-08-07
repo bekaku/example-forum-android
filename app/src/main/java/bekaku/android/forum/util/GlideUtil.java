@@ -13,7 +13,7 @@ public class GlideUtil {
 //                .load("https://i.pinimg.com/564x/d0/0f/92/d00f9238b6a3d3fb31e8675a6c10369d.jpg")
 //                .apply(RequestOptions.circleCropTransform())//make img circle
 //            .into(imageView);
-    //TEST COMMIT FILE TO GITHUB
+    //
     public static RequestOptions defaultOption(){
 
         return new RequestOptions()

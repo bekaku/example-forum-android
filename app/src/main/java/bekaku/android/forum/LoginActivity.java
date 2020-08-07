@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -35,7 +36,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_login);
-        if(getSupportActionBar()!=null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -47,13 +48,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         forumSetting = sqliteHelper.findCurrentSetting();
     }
 
-    private void loginProcess(){
+    private void loginProcess() {
 
         username = binding.loginName.getText().toString();
         password = binding.password.getText().toString();
-        if(Utility.isEmpty(username) || Utility.isEmpty(password)){
+        if (Utility.isEmpty(username) || Utility.isEmpty(password)) {
             Toast.makeText(this, getResources().getString(R.string.err_empty_form), Toast.LENGTH_SHORT).show();
-        }else{
+        } else {
             new LoginTask(LoginActivity.this).execute();
         }
 
@@ -83,8 +84,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             LoginActivity activity = this.getContext();
 
             HashMap<String, String> params = new HashMap<>();
-            params.put("_username",activity.username);
-            params.put("_pwd",Utility.hashSHA512(activity.password));
+            params.put("_username", activity.username);
+            params.put("_pwd", Utility.hashSHA512(activity.password));
+            Log.i("Login Action", activity.forumSetting.getApiMainUrl() + "/user/authen.php");
 
             return ApiUtil.okHttpPost(activity.forumSetting.getApiMainUrl() + "/user/authen.php", params);
         }
@@ -95,37 +97,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             getContext().finishLogin(s);
         }
     }
-    private void finishLogin(String response){
+
+    private void finishLogin(String response) {
+        binding.loginProgress.setVisibility(View.INVISIBLE);
         System.out.println(response);
         try {
             JSONObject data = new JSONObject(response);
             JSONObject jsonServerStatus = data.getJSONObject("server_status");
-            JSONObject jsonUserData = data.getJSONObject("data");
-            if(jsonServerStatus!=null){
+            int statusCode = jsonServerStatus.getInt("status");
+            String statusMsg = jsonServerStatus.getString("message");
 
-                int statusCode = jsonServerStatus.getInt("status");
-                String statusMsg = jsonServerStatus.getString("message");
+            Toast.makeText(this, statusMsg, Toast.LENGTH_LONG).show();
+            binding.loginProgress.setVisibility(View.GONE);
 
-                Toast.makeText(this, statusMsg, Toast.LENGTH_LONG).show();
-                binding.loginProgress.setVisibility(View.GONE);
+            if (statusCode == 1) {
+                //update user data in device setting and go to main activity if logined success
+                JSONObject jsonUserData = data.getJSONObject("data");
+                forumSetting.setUserId(jsonUserData.getInt("id"));
+                forumSetting.setUsername(jsonUserData.getString("username"));
+                forumSetting.setPicture(jsonUserData.getString("picture"));
+                forumSetting.setEmail(jsonUserData.getString("email"));
+                forumSetting.setCreated(jsonUserData.getString("created"));
 
-                if(statusCode==1){
-                    //update user data in device setting and go to main activity if logined success
-                    if(jsonUserData!=null){
-
-                        forumSetting.setUserId(jsonUserData.getInt("id"));
-                        forumSetting.setUsername(jsonUserData.getString("username"));
-                        forumSetting.setPicture(jsonUserData.getString("picture"));
-                        forumSetting.setEmail(jsonUserData.getString("email"));
-                        forumSetting.setCreated(jsonUserData.getString("created"));
-
-                        int effectrow = sqliteHelper.updateForumSetting(forumSetting);
-                        if(effectrow>0){
-                            Intent iMain = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(iMain);
-                            finish();
-                        }
-                    }
+                int effectrow = sqliteHelper.updateForumSetting(forumSetting);
+                if (effectrow > 0) {
+                    Intent iMain = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(iMain);
+                    finish();
                 }
             }
 
@@ -135,12 +133,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
@@ -149,12 +144,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View view) {
 
-        switch (view.getId()){
-            case R.id.register_button :
+        switch (view.getId()) {
+            case R.id.register_button:
                 Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(i);
                 break;
-            case R.id.sign_in_button :
+            case R.id.sign_in_button:
                 loginProcess();
                 break;
         }
