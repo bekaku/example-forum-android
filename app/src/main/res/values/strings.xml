@@ -33,6 +33,8 @@
     <string name="crud_delete">ลบ</string>
     <string name="comment_text">ความคิดเห็น</string>
     <string name="waiting_text">กรูณารอซักครู่</string>
+    <string name="confirm">ยืนยัน</string>
+    <string name="confirm_delete">ยืนยันการลบข้อมูล</string>
 
     <string name="err_ipaddress">ไอพีแอดเดรสไม่ถูกต้องหรือเซิฟเวอร์ไม่พบเซิฟเวอร์ที่กำหนด</string>
     <string name="err_ipaddress_empty">กรุณาระบุเลขไอพีแอดเดรส</string>

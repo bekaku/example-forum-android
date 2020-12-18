@@ -36,7 +36,9 @@ import java.util.List;
 import bekaku.android.forum.adapter.ThreadAdapter;
 import bekaku.android.forum.databinding.ActivityMainBinding;
 import bekaku.android.forum.dialog.CrudMenuDialog;
+import bekaku.android.forum.dialog.DialogConfirm;
 import bekaku.android.forum.dialog.DialogSettingServerIp;
+import bekaku.android.forum.dialog.LoadingDialog;
 import bekaku.android.forum.model.ForumSetting;
 import bekaku.android.forum.model.ThreadModel;
 import bekaku.android.forum.util.ApiUtil;
@@ -53,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ThreadAdapter threadAdapter;
     private int page = 1;
     private SqliteHelper sqliteHelper;
+    public LoadingDialog loadingDialog;
+    private int selectedItem = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         sqliteHelper = new SqliteHelper(MainActivity.this);
         forumSetting = sqliteHelper.findCurrentSetting();
-
+        loadingDialog = new LoadingDialog(MainActivity.this);
 
         //set toolbar description
         setToolbarDescription();
@@ -128,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void openMenuItem(final int position) {
         Log.i("MainActivity", "openMenuItem : " + position);
         //open Dialog and Create new api ip address and go to login activity
+        this.selectedItem = position;
         CrudMenuDialog crudMenu = new CrudMenuDialog(MainActivity.this);
         crudMenu.showDialog();
         crudMenu.setDialogResult(new CrudMenuDialog.OnMyDialogResult() {
@@ -137,7 +142,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.i("openMenuItem", result);
                     if (result.equalsIgnoreCase("edit")) {
                         openEdit(position);
+                    } else if (result.equalsIgnoreCase("delete")) {
+                        openDelete(position);
                     }
+                }
+            }
+        });
+    }
+
+    private void openDelete(final int position) {
+        final ThreadModel threadModel = threadModelList.get(position);
+        DialogConfirm dialogConfirm = new DialogConfirm(MainActivity.this
+                , getResources().getString(R.string.confirm)
+                , getResources().getString(R.string.confirm_delete)
+        );
+        dialogConfirm.showDialog();
+        dialogConfirm.setDialogResult(new DialogConfirm.OnMyDialogResult() {
+            @Override
+            public void finish(boolean result) {
+                if (result) {
+                    new DeleteAsync(MainActivity.this).execute(threadModel.getThreadId());
                 }
             }
         });
@@ -262,6 +286,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         binding.swipeContainer.setRefreshing(false);
+    }
+
+    // delete
+    private static class DeleteAsync extends AsyncTask<Integer, Void, String> {
+
+        private WeakReference<MainActivity> weakReference;
+
+        public DeleteAsync(MainActivity mainActivity) {
+            weakReference = new WeakReference<>(mainActivity);
+        }
+
+        private MainActivity getContext() {
+            return this.weakReference.get();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.getContext().loadingDialog.showDialog();
+        }
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+            int id = integers[0];
+            HashMap<String, String> params = new HashMap<>();
+            params.put("_thread_id", String.valueOf(id));
+            return ApiUtil.okHttpGet(this.getContext().forumSetting.getApiMainUrl() + "/thread/delete.php", params);
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            this.getContext().finishDelete(s);
+            this.getContext().loadingDialog.dismissDialog();
+        }
+    }
+
+    private void finishDelete(String response) {
+        Log.e("finishDelete", response);
+        try {
+            JSONObject data = new JSONObject(response);
+
+            JSONObject serverStatus = data.getJSONObject("server_status");
+
+            int statusCode = serverStatus.getInt("status");
+            String statusMsg = serverStatus.getString("message");
+            Toast.makeText(this, statusMsg, Toast.LENGTH_LONG).show();
+            if (statusCode == 1) {
+                threadModelList.remove(this.selectedItem);
+                threadAdapter.notifyDataSetChanged();
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -24,6 +24,7 @@ import java.util.List;
 
 import bekaku.android.forum.adapter.AvatarAdapter;
 import bekaku.android.forum.databinding.ActivityRegisterBinding;
+import bekaku.android.forum.dialog.LoadingDialog;
 import bekaku.android.forum.model.DefaultAvatar;
 import bekaku.android.forum.model.ForumSetting;
 import bekaku.android.forum.util.ApiUtil;
@@ -44,6 +45,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private String email;
     private String picture;
 
+    public LoadingDialog loadingDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +58,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         binding = DataBindingUtil.setContentView(this, R.layout.activity_register);
         SqliteHelper sqliteHelper = new SqliteHelper(RegisterActivity.this);
         forumSetting = sqliteHelper.findCurrentSetting();
-
+        loadingDialog = new LoadingDialog(RegisterActivity.this);
 
         binding.registerBtn.setOnClickListener(this);
 
@@ -86,6 +89,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }));
 
     }
+
     //get default avatar from server to listview
     private static class InitDataTask extends AsyncTask<Void, Void, String> {
 
@@ -103,6 +107,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         protected void onPreExecute() {
             super.onPreExecute();
             getContext().binding.progress.setVisibility(View.VISIBLE);
+            this.getContext().loadingDialog.showDialog();
         }
 
         @Override
@@ -113,7 +118,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-
+            this.getContext().loadingDialog.dismissDialog();
             getContext().prepareData(s);
         }
     }
@@ -141,17 +146,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
 
-    private void registerProcess(){
+    private void registerProcess() {
 
-        if(isValidateForm()){
+        if (isValidateForm()) {
             System.out.println("OKAY");
             new RegisterTask(RegisterActivity.this).execute();
-        }else{
+        } else {
             System.out.println("NOT OKAY");
         }
 
     }
-    private boolean isValidateForm(){
+
+    private boolean isValidateForm() {
 
         boolean isOk = true;
         username = binding.username.getText().toString();
@@ -159,17 +165,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         String rePwd = binding.rePassword.getText().toString();
         email = binding.email.getText().toString();
 
-        if(Utility.isEmpty(username) || Utility.isEmpty(pwd) || Utility.isEmpty(rePwd) || Utility.isEmpty(email)){
+        if (Utility.isEmpty(username) || Utility.isEmpty(pwd) || Utility.isEmpty(rePwd) || Utility.isEmpty(email)) {
             isOk = false;
             Toast.makeText(this, getResources().getString(R.string.err_empty_form), Toast.LENGTH_SHORT).show();
-        }else if(!pwd.equalsIgnoreCase(rePwd)){
+        } else if (!pwd.equalsIgnoreCase(rePwd)) {
             isOk = false;
             Toast.makeText(this, getResources().getString(R.string.err_pwd_confirm), Toast.LENGTH_SHORT).show();
         }
 
-        if(isOk){
-            for (DefaultAvatar defaultAvatar : avatarList){
-                if(defaultAvatar.isSelected()){
+        if (isOk) {
+            for (DefaultAvatar defaultAvatar : avatarList) {
+                if (defaultAvatar.isSelected()) {
                     picture = defaultAvatar.getImgApiFolder();
                     break;
                 }
@@ -203,10 +209,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             RegisterActivity activity = this.getContext();
 
             HashMap<String, String> params = new HashMap<>();
-            params.put("_username",activity.username);
-            params.put("_pwd",Utility.hashSHA512(activity.pwd));
-            params.put("_picture",activity.picture);
-            params.put("_email",activity.email);
+            params.put("_username", activity.username);
+            params.put("_pwd", Utility.hashSHA512(activity.pwd));
+            params.put("_picture", activity.picture);
+            params.put("_email", activity.email);
 
             return ApiUtil.okHttpPost(activity.forumSetting.getApiMainUrl() + "/user/create.php", params);
         }
@@ -218,23 +224,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             getContext().finishRegister(s);
         }
     }
-    private void finishRegister(String response){
-        System.out.println(response);
 
+    private void finishRegister(String response) {
         try {
             JSONObject data = new JSONObject(response);
 
             JSONObject serverStatus = data.getJSONObject("server_status");
-            if(serverStatus!=null){
 
-                int statusCode = serverStatus.getInt("status");
-                String statusMsg = serverStatus.getString("message");
-                Toast.makeText(this, statusMsg, Toast.LENGTH_LONG).show();
-                binding.progress.setVisibility(View.GONE);
+            int statusCode = serverStatus.getInt("status");
+            String statusMsg = serverStatus.getString("message");
+            Toast.makeText(this, statusMsg, Toast.LENGTH_LONG).show();
+            binding.progress.setVisibility(View.GONE);
 
-                if(statusCode==1){
-                    finish();
-                }
+            if (statusCode == 1) {
+                finish();
             }
 
         } catch (JSONException e) {
