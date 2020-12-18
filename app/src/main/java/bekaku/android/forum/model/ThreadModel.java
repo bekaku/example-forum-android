@@ -14,11 +14,29 @@ public class ThreadModel implements Serializable {
     private int postCount = 0;
     private int voteUp = 0;
     private int voteDown = 0;
+    private Boolean userLike = false;
+    private Boolean userDisLike = false;
+
 
     private boolean userVoteUp = false;
     private boolean userVoteDown = false;
     private boolean userComment = false;
 
+    public Boolean getUserLike() {
+        return userLike;
+    }
+
+    public void setUserLike(Boolean userLike) {
+        this.userLike = userLike;
+    }
+
+    public Boolean getUserDisLike() {
+        return userDisLike;
+    }
+
+    public void setUserDisLike(Boolean userDisLike) {
+        this.userDisLike = userDisLike;
+    }
 
     public int getThreadId() {
         return threadId;

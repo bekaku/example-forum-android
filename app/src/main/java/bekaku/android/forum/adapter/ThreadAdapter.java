@@ -78,12 +78,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
         viewHolder.voteDown.setText(String.valueOf(threadModel.getVoteDown()));
         viewHolder.comments.setText(String.valueOf(threadModel.getPostCount()));
 
-        if (threadModel.isUserVoteUp()) {
+        if (threadModel.getUserLike()) {
             viewHolder.voteUpIcon.setTextColor(c.getResources().getColor(R.color.color_green_1));
         } else {
             viewHolder.voteUpIcon.setTextColor(c.getResources().getColor(R.color.text_mute));
         }
-        if (threadModel.isUserVoteDown()) {
+        if (threadModel.getUserDisLike()) {
             viewHolder.voteDownIcon.setTextColor(c.getResources().getColor(R.color.color_red_1));
         } else {
             viewHolder.voteDownIcon.setTextColor(c.getResources().getColor(R.color.text_mute));
@@ -166,6 +166,9 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
                 model.setVoteUp(data.getInt("votes_up"));
                 model.setVoteDown(data.getInt("votes_down"));
                 model.setPostCount(data.getInt("post_count"));
+                model.setUserLike(data.getInt("is_user_like") > 0);
+                model.setUserDisLike(data.getInt("is_user_dislike") > 0);
+                model.setUserComment(data.getInt("is_user_comment") > 0);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -203,6 +206,9 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
                 model.setVoteUp(data.getInt("votes_up"));
                 model.setVoteDown(data.getInt("votes_down"));
                 model.setPostCount(data.getInt("post_count"));
+                model.setUserLike(data.getInt("is_user_like") > 0);
+                model.setUserDisLike(data.getInt("is_user_dislike") > 0);
+                model.setUserComment(data.getInt("is_user_comment") > 0);
 
             } catch (JSONException e) {
                 e.printStackTrace();

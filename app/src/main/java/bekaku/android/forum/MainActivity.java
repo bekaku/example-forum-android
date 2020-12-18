@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.recyclerView.setAdapter(threadAdapter);
 
         //fetch data from server with page 1
-        new FetchDataAsync(MainActivity.this).execute(this.page);
+        new FetchDataAsync(MainActivity.this).execute(this.page, forumSetting.getUserId());
 
 
         //initial onClick
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onRefresh() {
                 page = 1;
                 threadAdapter.clear();//clear old data from list
-                new FetchDataAsync(MainActivity.this).execute(page);
+                new FetchDataAsync(MainActivity.this).execute(page, forumSetting.getUserId());
             }
         });
         // Configure the refreshing colors
@@ -238,8 +238,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected String doInBackground(Integer... integers) {
             int page = integers[0];
+            int userId = integers[1];
             HashMap<String, String> params = new HashMap<>();
             params.put("page", String.valueOf(page));
+            params.put("_user_account_id", String.valueOf(userId));
             return ApiUtil.okHttpGet(this.getContext().forumSetting.getApiMainUrl() + "/thread/read.php", params);
         }
 
@@ -275,6 +277,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         model.setPostCount(data.getInt("post_count"));
                         model.setVoteUp(data.getInt("votes_up"));
                         model.setVoteDown(data.getInt("votes_down"));
+                        model.setUserLike(data.getInt("is_user_like") > 0);
+                        model.setUserDisLike(data.getInt("is_user_dislike") > 0);
+                        model.setUserComment(data.getInt("is_user_comment") > 0);
                         threadModelList.add(model);
 
                         threadAdapter.notifyDataSetChanged();

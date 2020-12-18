@@ -357,6 +357,23 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         binding.threadVoteUp.setText(String.valueOf(threadModel.getVoteUp()));
         binding.threadVoteDown.setText(String.valueOf(threadModel.getVoteDown()));
         binding.threadCommentsCount.setText(String.valueOf(threadModel.getPostCount()));
+
+
+        if (threadModel.getUserLike()) {
+            binding.threadVoteUp.setTextColor(getResources().getColor(R.color.color_green_1));
+        } else {
+            binding.threadVoteUp.setTextColor(getResources().getColor(R.color.text_mute));
+        }
+        if (threadModel.getUserDisLike()) {
+            binding.threadVoteDown.setTextColor(getResources().getColor(R.color.color_red_1));
+        } else {
+            binding.threadVoteDown.setTextColor(getResources().getColor(R.color.text_mute));
+        }
+        if (threadModel.isUserComment()) {
+            binding.threadCommentsCount.setTextColor(getResources().getColor(R.color.color_yellow_1));
+        } else {
+            binding.threadCommentsCount.setTextColor(getResources().getColor(R.color.text_mute));
+        }
     }
 
     private void setThredVoting() {
