@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="bekaku.android.forum.MainActivity" android:layout_height="wrap_content"  android:layout_width="wrap_content">
+
+    <item  android:id="@+id/new_topic"
+        android:title="@string/action_new_topic"
+        android:icon="@drawable/baseline_add_24"
+        />
+    <item  android:id="@+id/logout"
+        android:title="@string/action_sign_out"
+        android:icon="@drawable/outline_login_24"/>
+</menu>

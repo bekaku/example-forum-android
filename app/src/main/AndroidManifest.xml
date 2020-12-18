@@ -27,18 +27,29 @@
             android:theme="@style/AppNoActionBar" />
         <activity
             android:name=".RegisterActivity"
-            android:label="Register"
+            android:label="@string/register"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".LoginActivity"
-            android:label="Sign In"
+            android:label="@string/login"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".PostActivity"
-            android:label="Comment Post"
-            android:theme="@style/AppTheme" />
+            android:label="@string/post"
+            android:theme="@style/AppTheme"
+            />
+        <activity
+            android:name=".NewTopicActivity"
+            android:label="@string/topic_new"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize|stateHidden"/>
+        <activity
+            android:name=".EditTopicActivity"
+            android:label="@string/topic_edit"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize|stateHidden"/>
     </application>
 
 </manifest>

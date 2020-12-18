@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -13,15 +14,16 @@
         android:padding="15dp">
 
         <bekaku.android.forum.font.FontAwesomeTextView
-            android:id="@+id/notify_icon"
+            android:id="@+id/menu_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_gravity="center_vertical"
             android:padding="8dp"
-            android:text="@string/fa_ellipsis_v"
+            android:text="@string/fa_ellipsis_h"
             android:textColor="@color/text_icon"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:ignore="RelativeOverlap" />
 
         <LinearLayout
             android:id="@+id/thread_holder"
@@ -92,10 +94,7 @@
             android:layout_below="@+id/thread_holder"
             android:layout_alignParentStart="true"
             android:layout_gravity="start"
-            android:paddingStart="0dp"
-            android:paddingTop="5dp"
-            android:paddingEnd="0dp"
-            android:paddingBottom="5dp"
+            android:padding="15dp"
             android:text="@string/text_dummy"
             android:textColor="@color/text_body" />
 

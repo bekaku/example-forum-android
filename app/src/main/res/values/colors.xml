@@ -14,6 +14,25 @@
     <color name="color_manual_grey_1">#dee2e8</color>
     <color name="color_manual_grey_2">#eef3f8</color>
 
+    <!-- manual -->
+    <color name="material_black">#000000</color>
+    <color name="material_white">#ffffff</color>
+    <color name="material_manual_1">#F1F4F9</color>
+    <color name="material_manual_2">#e9edf2</color>
+    <color name="material_manual_3">#dee2e8</color>
+    <color name="manual_border_1">#eef3f8</color>
+    <color name="manual_border_2">#e1e8ed</color>
+    <color name="manual_border_3">#e0e0e0</color>
+    <color name="manual_border_4">#f7f8fb</color>
+    <color name="manual_border_5">#ebeef6</color>
+    <color name="manual_border_6">#d5dadb</color>
+    <color name="manual_border_7">#dfe4f1</color>
+    <color name="border_main">#dad8d8</color>
+    <color name="black">#000000</color>
+    <color name="black_95_percent">#95000000</color>
+    <color name="main_transparent">#00000000</color>
+
+
     <color name="color_red_1">#c83b00</color>
     <color name="color_green_1">#008d38</color>
     <color name="color_yellow_1">#e0af1e</color>

@@ -1,5 +1,7 @@
 package bekaku.android.forum.util;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,7 +23,7 @@ public class ApiUtil {
     public static final String API_URI = "/grandats_project/forum/api";
 
     public static String okHttpGet(String url, HashMap<String, String> params){
-
+        Log.e("okHttpGet",url);
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .writeTimeout(15, TimeUnit.SECONDS)

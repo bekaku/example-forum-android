@@ -25,7 +25,8 @@ public class FontAwesomeTextView extends AppCompatTextView {
 
     private void setTypeface() {
         if (sFontAwesomeIcons == null) {
-            sFontAwesomeIcons = Typeface.createFromAsset(getContext().getAssets(), "fonts/fa-solid-900.ttf");
+//            sFontAwesomeIcons = Typeface.createFromAsset(getContext().getAssets(), "fonts/fa-solid-900.ttf");
+            sFontAwesomeIcons = Typeface.createFromAsset(getContext().getAssets(), "fonts/fa-5-solid-900.otf");
         }
         setTypeface(sFontAwesomeIcons);
     }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 
+import bekaku.android.forum.MainActivity;
+import bekaku.android.forum.PostActivity;
 import bekaku.android.forum.R;
 import bekaku.android.forum.model.ForumSetting;
 import bekaku.android.forum.model.ThreadModel;
@@ -75,30 +78,39 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
         viewHolder.voteDown.setText(String.valueOf(threadModel.getVoteDown()));
         viewHolder.comments.setText(String.valueOf(threadModel.getPostCount()));
 
-        if(threadModel.isUserVoteUp()){
+        if (threadModel.isUserVoteUp()) {
             viewHolder.voteUpIcon.setTextColor(c.getResources().getColor(R.color.color_green_1));
-        }else{
+        } else {
             viewHolder.voteUpIcon.setTextColor(c.getResources().getColor(R.color.text_mute));
         }
-        if(threadModel.isUserVoteDown()){
+        if (threadModel.isUserVoteDown()) {
             viewHolder.voteDownIcon.setTextColor(c.getResources().getColor(R.color.color_red_1));
-        }else{
+        } else {
             viewHolder.voteDownIcon.setTextColor(c.getResources().getColor(R.color.text_mute));
         }
 
-        if(threadModel.isUserComment()){
+        if (threadModel.isUserComment()) {
             viewHolder.commentsIcon.setTextColor(c.getResources().getColor(R.color.color_yellow_1));
-        }else{
+        } else {
             viewHolder.commentsIcon.setTextColor(c.getResources().getColor(R.color.text_mute));
+        }
+        if(threadModel.getUserAccountId()==forumSetting.getUserId()){
+            viewHolder.menuIcon.setVisibility(View.VISIBLE);
+        }else{
+            viewHolder.menuIcon.setVisibility(View.INVISIBLE);
         }
 
         viewHolder.voteUpIcon.setOnClickListener(this);
         viewHolder.voteDownIcon.setOnClickListener(this);
         viewHolder.commentsIcon.setOnClickListener(this);
+        viewHolder.menuIcon.setOnClickListener(this);
+        viewHolder.subject.setOnClickListener(this);
         //set tag for on click icon
         viewHolder.voteUpIcon.setTag(iposition);
         viewHolder.voteDownIcon.setTag(iposition);
         viewHolder.commentsIcon.setTag(iposition);
+        viewHolder.menuIcon.setTag(iposition);
+        viewHolder.subject.setTag(iposition);
     }
 
     @Override
@@ -112,31 +124,30 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
         TextView tag;
         int posiotion;
         ThreadModel model;
-        switch (view.getId()){
-            case R.id.vote_up_icon :
-                tag = (TextView) view;
-                posiotion = (Integer) tag.getTag();
-                model = list.get(posiotion);
+
+        tag = (TextView) view;
+        posiotion = (Integer) tag.getTag();
+        model = list.get(posiotion);
+        switch (view.getId()) {
+            case R.id.vote_up_icon:
                 new VoteThreadUp().execute(model);
                 break;
-            case R.id.vote_down_icon :
-                tag = (TextView) view;
-                posiotion = (Integer) tag.getTag();
-                model = list.get(posiotion);
+            case R.id.vote_down_icon:
                 new VoteThreadDown().execute(model);
                 break;
-            case R.id.comments_icon :
-                tag = (TextView) view;
-                posiotion = (Integer) tag.getTag();
-                model = list.get(posiotion);
+            case R.id.comments_icon:
+            case R.id.thread_subject:
                 commentAction(model);
                 break;
-
+            case R.id.menu_icon:
+//                Log.i("ThredAdapter", "onClickMenu : " + posiotion);
+                ((MainActivity) c).openMenuItem(posiotion);
+                break;
         }
     }
 
     @SuppressLint("StaticFieldLeak")
-    private class VoteThreadUp extends AsyncTask<ThreadModel, Void, ThreadModel>{
+    private class VoteThreadUp extends AsyncTask<ThreadModel, Void, ThreadModel> {
 
         @Override
         protected ThreadModel doInBackground(ThreadModel... models) {
@@ -149,6 +160,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
             String response = ApiUtil.okHttpGet(forumSetting.getApiMainUrl() + "/vote/upthread.php", params);
             try {
 
+                assert response != null;
                 JSONObject json = new JSONObject(response);
                 JSONObject data = json.getJSONObject("data");
                 model.setVoteUp(data.getInt("votes_up"));
@@ -171,7 +183,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
     }
 
     @SuppressLint("StaticFieldLeak")
-    private class VoteThreadDown extends AsyncTask<ThreadModel, Void, ThreadModel>{
+    private class VoteThreadDown extends AsyncTask<ThreadModel, Void, ThreadModel> {
 
         @Override
         protected ThreadModel doInBackground(ThreadModel... models) {
@@ -185,6 +197,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
 
             try {
 
+                assert response != null;
                 JSONObject json = new JSONObject(response);
                 JSONObject data = json.getJSONObject("data");
                 model.setVoteUp(data.getInt("votes_up"));
@@ -207,17 +220,15 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
     }
 
 
-
-    private void commentAction(ThreadModel threadModel){
-
-        //open comment activity
-        System.out.println("comments_icon==>"+threadModel.getSubject());
+    private void commentAction(ThreadModel threadModel) {
+        Intent iPost = new Intent(c, PostActivity.class);
+        iPost.putExtra("thread_id", threadModel.getThreadId());//send value
+        iPost.putExtra("bekaku.android.forum.model.ThreadModel", threadModel); //send object (implements  Serializable) in model before use
+        c.startActivity(iPost);
     }
 
 
-
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView userImg;
         public TextView username;
         public TextView datetime;
@@ -229,6 +240,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
         public TextView voteDown;
         public TextView commentsIcon;
         public TextView comments;
+        public TextView menuIcon;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -243,6 +255,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.ViewHolder
             voteDown = itemView.findViewById(R.id.vote_down);
             commentsIcon = itemView.findViewById(R.id.comments_icon);
             comments = itemView.findViewById(R.id.comments_count);
+            menuIcon = itemView.findViewById(R.id.menu_icon);
         }
     }
 }

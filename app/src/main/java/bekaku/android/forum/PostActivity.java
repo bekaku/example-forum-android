@@ -11,11 +11,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -31,13 +33,13 @@ import java.util.List;
 
 import bekaku.android.forum.adapter.PostAdapter;
 import bekaku.android.forum.databinding.ActivityPostBinding;
+import bekaku.android.forum.dialog.CrudMenuDialog;
+import bekaku.android.forum.dialog.LoadingDialog;
 import bekaku.android.forum.model.ForumSetting;
 import bekaku.android.forum.model.PostModel;
 import bekaku.android.forum.model.ThreadModel;
 import bekaku.android.forum.util.ApiUtil;
 import bekaku.android.forum.util.GlideUtil;
-import bekaku.android.forum.util.HidingScrollListener2;
-import bekaku.android.forum.util.HidingScrollListener3;
 import bekaku.android.forum.util.HidingScrollListener;
 import bekaku.android.forum.util.SqliteHelper;
 import bekaku.android.forum.util.Utility;
@@ -54,6 +56,9 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
     private PostAdapter postAdapter;
     private HidingScrollListener hidingScrollListener;
     private int threshold = 50;
+    TextView replyText;
+
+    public LoadingDialog loadingDialog;
 
 
     @Override
@@ -64,6 +69,10 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         }
 //        setContentView(R.layout.activity_post);
         binding = DataBindingUtil.setContentView(PostActivity.this, R.layout.activity_post);
+        loadingDialog = new LoadingDialog(PostActivity.this);
+
+        TextView replySubmit = findViewById(R.id.reply_submit);
+        replyText = findViewById(R.id.reply_edit_text);
 
         //get devide setting
         SqliteHelper sqliteHelper = new SqliteHelper(PostActivity.this);
@@ -78,13 +87,17 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
             if (threadModel != null) {
                 System.out.println("thread subject=>>" + threadModel.getSubject());
                 setThreadData();
-
-
                 postAdapter = new PostAdapter(PostActivity.this, postModelList, forumSetting);
                 RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(PostActivity.this);
                 binding.recyclerView.setLayoutManager(mLayoutManager);
                 binding.recyclerView.setItemAnimator(new DefaultItemAnimator());
                 binding.recyclerView.setAdapter(postAdapter);
+
+                if (threadModel.getUserAccountId() == forumSetting.getUserId()) {
+                    binding.menuIcon.setVisibility(View.VISIBLE);
+                } else {
+                    binding.menuIcon.setVisibility(View.INVISIBLE);
+                }
 
                 //fetch this thread's post data from server
                 new FetchDataAsync(PostActivity.this).execute(threadId, page);
@@ -96,7 +109,6 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         System.out.println("Thread id =>" + threadId);
-
 
 //        implement pull to refresh
         binding.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -117,7 +129,9 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         //initial onClick
         binding.threadVoteUpIcon.setOnClickListener(this);
         binding.threadVoteDownIcon.setOnClickListener(this);
-
+        binding.menuIcon.setOnClickListener(this);
+        replySubmit.setOnClickListener(this);
+        binding.menuIcon.setVisibility(View.INVISIBLE);
 
         //initial hide layout when scroll recyclerview
 //        hidingScrollListener = new HidingScrollListener(threshold) {
@@ -168,7 +182,35 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.thread_vote_down_icon:
                 new VoteThreadDown().execute(threadModel);
                 break;
+            case R.id.menu_icon:
+                openMenuItem();
+                break;
+            case R.id.reply_submit:
+                onReplySubmit();
+                break;
         }
+    }
+
+    private void onReplySubmit() {
+        if (!Utility.isEmpty(replyText.getText())) {
+            Log.i("PostActivity", "reply_submit" + " " + replyText.getText());
+            new ReplySubmit(PostActivity.this).execute(this.threadId);
+        }
+    }
+
+    public void openMenuItem() {
+        Log.i("PostActivity", "openMenuItem ");
+        //open Dialog and Create new api ip address and go to login activity
+        CrudMenuDialog crudMenu = new CrudMenuDialog(PostActivity.this);
+        crudMenu.showDialog();
+        crudMenu.setDialogResult(new CrudMenuDialog.OnMyDialogResult() {
+            @Override
+            public void finish(String result) {
+                if (result != null) {
+                    Log.i("openMenuItem", result);
+                }
+            }
+        });
     }
 
     private static class FetchDataAsync extends AsyncTask<Integer, Void, String> {
@@ -187,6 +229,7 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         protected void onPreExecute() {
             super.onPreExecute();
             this.getContext().binding.swipeContainer.setRefreshing(true);
+            this.getContext().loadingDialog.showDialog();
         }
 
         @Override
@@ -205,38 +248,22 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             this.getContext().prepareData(s);
+            this.getContext().loadingDialog.dismissDialog();
         }
 
     }
 
     private void prepareData(String response) {
-
-        System.out.println(response);
-
         if (!Utility.isEmpty(response)) {
             try {
                 JSONObject jo = new JSONObject(response);
                 JSONArray jsonArray = jo.getJSONArray("data");
 
-                PostModel model;
                 if (jsonArray.length() > 0) {
-
                     //increase page for the next time
                     page++;
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject data = jsonArray.getJSONObject(i);
-
-                        model = new PostModel();
-                        model.setPostId(data.getInt("id"));
-                        model.setContent(data.getString("content"));
-                        model.setThreadId(data.getInt("threads_id"));
-                        model.setCreated(data.getString("created"));
-                        model.setUserAccountId(data.getInt("user_account_id"));
-                        model.setUserAccountName(data.getString("user_account_name"));
-                        model.setUserAccountPiture(data.getString("user_account_picture"));
-                        postModelList.add(model);
-
-                        postAdapter.notifyDataSetChanged();
+                        setPostModel(jsonArray.getJSONObject(i));
                     }
                 }
             } catch (JSONException e) {
@@ -244,6 +271,76 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         binding.swipeContainer.setRefreshing(false);
+    }
+
+    private static class ReplySubmit extends AsyncTask<Integer, Void, String> {
+
+        private WeakReference<PostActivity> weakReference;
+
+        public ReplySubmit(PostActivity activity) {
+            weakReference = new WeakReference<>(activity);
+        }
+
+        private PostActivity getContext() {
+            return this.weakReference.get();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.getContext().loadingDialog.showDialog();
+        }
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+
+            int threadId = integers[0];
+            HashMap<String, String> params = new HashMap<>();
+            params.put("_thread_id", String.valueOf(threadId));
+            params.put("_content", this.getContext().replyText.getText().toString());
+            params.put("_user_account_id", String.valueOf(this.getContext().forumSetting.getUserId()));
+
+            return ApiUtil.okHttpPost(this.getContext().forumSetting.getApiMainUrl() + "/post/create.php", params);
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            this.getContext().prepareDataReply(s);
+            this.getContext().loadingDialog.dismissDialog();
+        }
+
+    }
+
+    private void prepareDataReply(String response) {
+        if (!Utility.isEmpty(response)) {
+            try {
+                JSONObject jo = new JSONObject(response);
+
+                JSONObject serverStatus = jo.getJSONObject("server_status");
+                String statusMsg = serverStatus.getString("message");
+                Toast.makeText(this, statusMsg, Toast.LENGTH_LONG).show();
+                setPostModel(jo.getJSONObject("data"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        replyText.setText("");
+    }
+
+    private void setPostModel(JSONObject data) throws JSONException {
+        if (data != null) {
+            PostModel model = new PostModel();
+            model.setPostId(data.getInt("id"));
+            model.setContent(data.getString("content"));
+            model.setThreadId(data.getInt("threads_id"));
+            model.setCreated(data.getString("created"));
+            model.setUserAccountId(data.getInt("user_account_id"));
+            model.setUserAccountName(data.getString("user_account_name"));
+            model.setUserAccountPiture(data.getString("user_account_picture"));
+            postModelList.add(model);
+            postAdapter.notifyDataSetChanged();
+        }
     }
 
     private void setThreadData() {
@@ -301,6 +398,7 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
             String response = ApiUtil.okHttpGet(forumSetting.getApiMainUrl() + "/vote/upthread.php", params);
             try {
 
+                assert response != null;
                 JSONObject json = new JSONObject(response);
                 JSONObject data = json.getJSONObject("data");
                 model.setVoteUp(data.getInt("votes_up"));
@@ -336,6 +434,7 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
 
             try {
 
+                assert response != null;
                 JSONObject json = new JSONObject(response);
                 JSONObject data = json.getJSONObject("data");
                 model.setVoteUp(data.getInt("votes_up"));

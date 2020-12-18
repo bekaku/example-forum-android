@@ -147,4 +147,14 @@ public class SqliteHelper extends SQLiteOpenHelper {
 
         return setting;
     }
+    public long deleteAllSetting() {
+
+        sqLiteDatabase = this.getWritableDatabase();
+
+        String whereClause = "";
+        String[] whereArgs = new String[]{};
+        long effectRow = sqLiteDatabase.delete(tableSetting, whereClause, whereArgs);
+        sqLiteDatabase.close();
+        return effectRow;
+    }
 }

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialog_holder"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="#33000000"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_border_bottom_1"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:visibility="visible">
+
+            <!--            <bekaku.android.forum.font.FontAwesomeTextView-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginEnd="5dp"-->
+            <!--                android:text="@string/fa_pencil"-->
+            <!--                android:textColor="@color/color_grey_600"-->
+            <!--                android:textSize="20sp" />-->
+
+            <TextView
+                android:id="@+id/dialog_universal_warning_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/choose"
+                android:textColor="@color/color_grey_800"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="6dp"
+            android:layout_marginTop="10dp"
+            android:visibility="visible">
+
+            <bekaku.android.forum.font.FontAwesomeTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_horizontal"
+                android:padding="8dp"
+                android:text="@string/fa_pencil"
+                android:textColor="@color/text_icon"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/crud_edit"
+                android:textColor="@color/color_grey_800"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:padding="6dp"
+            android:visibility="visible">
+
+            <bekaku.android.forum.font.FontAwesomeTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_horizontal"
+                android:padding="8dp"
+                android:text="@string/fa_trash"
+                android:textColor="@color/color_red_1"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/crud_delete"
+                android:textColor="@color/color_grey_800"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_border_top_1"
+            android:gravity="end"
+
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/cancleBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="#fff"
+                android:gravity="center"
+                android:minWidth="64dp"
+                android:padding="12dp"
+                android:text="@string/action_cancle"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

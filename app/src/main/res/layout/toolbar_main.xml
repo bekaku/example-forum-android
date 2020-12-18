@@ -61,15 +61,15 @@
         </LinearLayout>
 
 
-        <bekaku.android.forum.font.FontAwesomeTextView
-            android:id="@+id/toolbar_plus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:padding="10dp"
-            android:text="@string/fa_plus"
-            android:textSize="20sp" />
+<!--        <bekaku.android.forum.font.FontAwesomeTextView-->
+<!--            android:id="@+id/toolbar_plus"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_alignParentEnd="true"-->
+<!--            android:layout_centerVertical="true"-->
+<!--            android:padding="10dp"-->
+<!--            android:text="@string/fa_ellipsis_v"-->
+<!--            android:textSize="20sp" />-->
 
 
     </RelativeLayout>

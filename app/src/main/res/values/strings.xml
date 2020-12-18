@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Android Forum</string>
     <string name="app_author_credit">By Grand Ats Co.,Ltd</string>
     <string name="title_activity_login">Sign in</string>
@@ -18,6 +18,21 @@
     <string name="action_search_thread">ค้นหากระทู้</string>
     <string name="action_loadmore">โหลดข้อมูลเพิ่ม</string>
     <string name="action_loading">กำลังโหลดข้อมูล&#8230;</string>
+    <string name="action_new_topic">สร้างกระทู้ใหม่</string>
+    <string name="action_sign_out">ออกจากระบบ</string>
+    <string name="topic_new">กระทู้ใหม่</string>
+    <string name="topic_edit">แก้ไขกระทู้</string>
+    <string name="topic_title">ชื่อกระทู้</string>
+    <string name="topic_content">เนื้อหากระทู้</string>
+    <string name="post">กระทู้</string>
+    <string name="register">สมัครสมาชิก</string>
+    <string name="login">เข้าสู่ระบบ</string>
+    <string name="choose">ตัวเลือก</string>
+    <string name="crud_view">ดู</string>
+    <string name="crud_edit">แก้ไข</string>
+    <string name="crud_delete">ลบ</string>
+    <string name="comment_text">ความคิดเห็น</string>
+    <string name="waiting_text">กรูณารอซักครู่</string>
 
     <string name="err_ipaddress">ไอพีแอดเดรสไม่ถูกต้องหรือเซิฟเวอร์ไม่พบเซิฟเวอร์ที่กำหนด</string>
     <string name="err_ipaddress_empty">กรุณาระบุเลขไอพีแอดเดรส</string>
@@ -29,8 +44,12 @@
     <string name="fa_comment_alt">&#xf27a;</string>
     <string name="fa_comments">&#xf086;</string>
     <string name="fa_server">&#xf233;</string>
+    <string name="fa_pencil">&#xf303;</string>
+    <string name="fa_eye">&#xf06e;</string>
+    <string name="fa_trash">&#xf1f8;</string>
     <string name="fa_check_circle">&#xf058;</string>
     <string name="fa_ellipsis_v">&#xf142;</string>
+    <string name="fa_ellipsis_h">&#xf141;</string>
     <string name="fa_plus">&#xf067;</string>
     <string name="fa_search">&#xf002;</string>
     <string name="fa_times">&#xf00d;</string>
@@ -38,4 +57,5 @@
     <string name="fa_thumbs_up">&#xf164;</string>
     <string name="fa_thumbs_down">&#xf165;</string>
     <string name="fa_caret_left">&#xf0d9;</string>
+    <string name="fa_paper_plane" tools:ignore="ExtraTranslation">&#xf1d8;</string>
 </resources>

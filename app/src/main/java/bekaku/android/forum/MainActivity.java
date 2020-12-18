@@ -11,10 +11,14 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -31,6 +35,8 @@ import java.util.List;
 
 import bekaku.android.forum.adapter.ThreadAdapter;
 import bekaku.android.forum.databinding.ActivityMainBinding;
+import bekaku.android.forum.dialog.CrudMenuDialog;
+import bekaku.android.forum.dialog.DialogSettingServerIp;
 import bekaku.android.forum.model.ForumSetting;
 import bekaku.android.forum.model.ThreadModel;
 import bekaku.android.forum.util.ApiUtil;
@@ -46,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<ThreadModel> threadModelList = new ArrayList<>();
     private ThreadAdapter threadAdapter;
     private int page = 1;
+    private SqliteHelper sqliteHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
 
-        SqliteHelper sqliteHelper = new SqliteHelper(MainActivity.this);
+        sqliteHelper = new SqliteHelper(MainActivity.this);
         forumSetting = sqliteHelper.findCurrentSetting();
 
 
@@ -100,22 +107,85 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, new RecyclerTouchListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                ThreadModel threadSeleted = threadModelList.get(position);
-                Intent iPost = new Intent(MainActivity.this, PostActivity.class);
-                iPost.putExtra("thread_id", threadSeleted.getThreadId());//send value
-                iPost.putExtra("bekaku.android.forum.model.ThreadModel", threadSeleted); //send object (implements  Serializable) in model before use
-                startActivity(iPost);
+//                ThreadModel threadSeleted = threadModelList.get(position);
+//                Log.i("recyclerView", "onItemClick : " + position+" "+view.getId());
+//                switch (view.getId()) {
+//                    case R.id.thread_subject:
+//                        Intent iPost = new Intent(MainActivity.this, PostActivity.class);
+//                        iPost.putExtra("thread_id", threadSeleted.getThreadId());//send value
+//                        iPost.putExtra("bekaku.android.forum.model.ThreadModel", threadSeleted); //send object (implements  Serializable) in model before use
+//                        startActivity(iPost);
+//                        break;
+//                    case R.id.menu_icon:
+//                        Log.i("ThredAdapter", "onClickMenu : " + position);
+//                        break;
+//                }
             }
         }));
 
     }
 
-    private void setToolbarDescription(){
+    public void openMenuItem(final int position) {
+        Log.i("MainActivity", "openMenuItem : " + position);
+        //open Dialog and Create new api ip address and go to login activity
+        CrudMenuDialog crudMenu = new CrudMenuDialog(MainActivity.this);
+        crudMenu.showDialog();
+        crudMenu.setDialogResult(new CrudMenuDialog.OnMyDialogResult() {
+            @Override
+            public void finish(String result) {
+                if (result != null) {
+                    Log.i("openMenuItem", result);
+                    if (result.equalsIgnoreCase("edit")) {
+                        openEdit(position);
+                    }
+                }
+            }
+        });
+    }
+
+    private void openEdit(int position) {
+        ThreadModel threadModel = threadModelList.get(position);
+        if (threadModel != null) {
+            Intent iPost = new Intent(MainActivity.this, EditTopicActivity.class);
+            iPost.putExtra("thread_id", threadModel.getThreadId());//send value
+            startActivity(iPost);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.new_topic:
+                Toast.makeText(getApplicationContext(), "New topic", Toast.LENGTH_LONG).show();
+                Intent newTopic = new Intent(MainActivity.this, NewTopicActivity.class);
+                startActivity(newTopic);
+                return true;
+            case R.id.logout:
+                sqliteHelper.deleteAllSetting();
+                Toast.makeText(getApplicationContext(), "Logout sucessfull", Toast.LENGTH_LONG).show();
+                Intent iLogin = new Intent(MainActivity.this, SplashScreenActivity.class);
+                startActivity(iLogin);
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void setToolbarDescription() {
         ImageView toolbarImg = toolbar.findViewById(R.id.toolbar_img);
-        TextView toolbarPlus = toolbar.findViewById(R.id.toolbar_plus);
+//        TextView toolbarPlus = toolbar.findViewById(R.id.toolbar_plus);
 
         toolbarImg.setOnClickListener(this);
-        toolbarPlus.setOnClickListener(this);
+//        toolbarPlus.setOnClickListener(this);
 
         Glide.with(this)
                 .load(forumSetting.getPicture())
@@ -123,14 +193,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .into(toolbarImg);
     }
 
-    private static class FetchDataAsync extends AsyncTask<Integer, Void, String>{
+    private static class FetchDataAsync extends AsyncTask<Integer, Void, String> {
 
         private WeakReference<MainActivity> weakReference;
 
         public FetchDataAsync(MainActivity mainActivity) {
             weakReference = new WeakReference<>(mainActivity);
         }
-        private MainActivity getContext(){
+
+        private MainActivity getContext() {
             return this.weakReference.get();
         }
 
@@ -147,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             params.put("page", String.valueOf(page));
             return ApiUtil.okHttpGet(this.getContext().forumSetting.getApiMainUrl() + "/thread/read.php", params);
         }
+
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
@@ -154,9 +226,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
-    private void prepareData(String response){
 
-        if(!Utility.isEmpty(response)){
+    private void prepareData(String response) {
+
+        if (!Utility.isEmpty(response)) {
             try {
                 JSONObject jo = new JSONObject(response);
                 JSONArray jsonArray = jo.getJSONArray("data");
@@ -194,14 +267,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
 
-        switch (view.getId()){
-            case R.id.toolbar_img :
+        switch (view.getId()) {
+            case R.id.toolbar_img:
                 //open seting activity
                 break;
-            case R.id.toolbar_plus:
-                //open thread create
-                break;
+//            case R.id.toolbar_plus:
+            //open thread create
+//                break;
             case R.id.load_more:
+                new FetchDataAsync(MainActivity.this).execute(this.page);
                 break;
 
         }
